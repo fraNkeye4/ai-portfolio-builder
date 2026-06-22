@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Portfolio Builder</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" integrity="sha512-oHDEc8XedxwSzS4HWp+Z79iLFpSM0bPQm9i1Q3KxhU22Z3X4i1AL1jmYXrSlVZQut/Wrpazrb83j9IbTO5wRPw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      /* Additional inline styles for result display */
+      .hidden { display: none; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>AI Portfolio Builder</h1>
+        <p>Create a personalized project idea to strengthen your university application</p>
+      </header>
+      <main>
+        <!-- Form Section -->
+        <section id="form-section">
+          <form id="portfolio-form" class="form">
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input type="text" id="name" name="name" placeholder="Your name" />
+            </div>
+            <div class="form-group">
+              <label for="age">Age</label>
+              <input type="number" id="age" name="age" min="10" max="100" />
+            </div>
+            <div class="form-group">
+              <label for="country">Country</label>
+              <input type="text" id="country" name="country" placeholder="Country" />
+            </div>
+            <div class="form-group">
+              <label for="level">Programming Level</label>
+              <select id="level" name="level">
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="interests">Interests (choose at least one)</label>
+              <select id="interests" name="interests" multiple size="5">
+                <!-- Options will be populated by JavaScript -->
+              </select>
+              <small class="help">Hold Ctrl (Windows) or Command (Mac) to select multiple options.</small>
+            </div>
+            <div class="form-group">
+              <label for="university">Dream University</label>
+              <input type="text" id="university" name="university" placeholder="MIT, Stanford, Caltech, ..." />
+            </div>
+            <div class="form-actions">
+              <button type="submit">Generate Project</button>
+            </div>
+          </form>
+        </section>
+
+        <!-- Result Section -->
+        <section id="result-section" class="hidden">
+          <h2 id="project-title"></h2>
+          <p id="project-description"></p>
+          <div id="roadmap-container">
+            <h3>Roadmap</h3>
+            <ol id="roadmap-list"></ol>
+          </div>
+          <div id="details-container">
+            <h3>Your Details</h3>
+            <ul id="details-list"></ul>
+          </div>
+          <p id="next-steps">
+            This prototype currently provides a basic roadmap and project description. Future
+            enhancements could include automatic generation of a detailed README, a research
+            paper template, and a one‑click portfolio website. Feel free to expand the
+            underlying code or connect it to more sophisticated AI models to generate
+            fully fleshed out materials.
+          </p>
+          <div class="actions">
+            <button id="back-button" class="button">Generate Another</button>
+          </div>
+        </section>
+      </main>
+      <footer>
+        <p>© <span id="current-year"></span> AI Portfolio Builder</p>
+      </footer>
+    </div>
+
+    <script>
+      /* JavaScript for AI Portfolio Builder */
+      (function () {
+        // Project pool (mirrors the Python dictionary in app.py)
+        const projectPool = {
+          ai: [
+            {
+              title: 'Autonomous Drone for Search and Rescue',
+              description:
+                'Design and build a drone equipped with cameras and onboard AI that can autonomously navigate disaster zones and locate survivors using computer vision techniques.',
+            },
+            {
+              title: 'Skin Lesion Classification with Deep Learning',
+              description:
+                'Develop a convolutional neural network that takes images of skin lesions and classifies them as benign or malignant. This project touches on medical imaging and machine learning.',
+            },
+            {
+              title: 'Music Genre Classifier',
+              description:
+                'Use audio processing and neural networks to classify songs into genres. Explore feature extraction (e.g., MFCCs) and model training with frameworks like PyTorch or TensorFlow.',
+            },
+          ],
+          web: [
+            {
+              title: 'Personal Knowledge Graph Website',
+              description:
+                'Create a web app that lets users enter notes and links, then visualizes the relationships among them as a graph. Implement with a frontend framework and backend API.',
+            },
+            {
+              title: 'Real‑Time Collaborative Editor',
+              description:
+                'Build an online text editor where multiple people can edit documents simultaneously. Explore operational transforms or CRDTs to handle concurrency.',
+            },
+            {
+              title: 'Interactive Coding Tutorial Platform',
+              description:
+                'Design a platform that provides interactive coding lessons with embedded code editors, automatic grading and step‑by‑step hints.',
+            },
+          ],
+          robotics: [
+            {
+              title: 'Line Following Robot',
+              description:
+                'Assemble a small robot that uses sensors to follow lines on the ground. Expand the project by adding obstacle avoidance and path planning.',
+            },
+            {
+              title: 'Gesture Controlled Robotic Arm',
+              description:
+                'Build a robotic arm that mimics your hand movements using sensors like accelerometers or a Leap Motion controller.',
+            },
+            {
+              title: 'Home Automation Robot',
+              description:
+                'Create a small rover that can navigate your home and perform tasks such as delivering items, monitoring rooms or controlling smart devices.',
+            },
+          ],
+          biology: [
+            {
+              title: 'DNA Sequence Analyzer',
+              description:
+                'Write a tool that parses DNA sequences, identifies genes and predicts the effect of mutations. Learn about bioinformatics and sequence alignment algorithms.',
+            },
+            {
+              title: 'Plant Growth Monitoring System',
+              description:
+                'Design a sensor network to measure light, temperature and humidity for plants. Use the data to optimize growth and visualize it on a dashboard.',
+            },
+            {
+              title: 'Protein Folding Simulation',
+              description:
+                'Create a simulation that shows how proteins fold from a chain of amino acids into complex three‑dimensional structures.',
+            },
+          ],
+          physics: [
+            {
+              title: 'Solar System Simulator',
+              description:
+                'Develop a physics engine that models the motion of planets and moons under gravity. Visualize orbital mechanics and allow users to change parameters like mass and distance.',
+            },
+            {
+              title: 'Quantum Random Number Generator',
+              description:
+                'Explore quantum mechanics by building a device or simulation that produces truly random numbers based on quantum events.',
+            },
+            {
+              title: 'Wind Tunnel Simulation',
+              description:
+                'Write a program that simulates airflow over different shapes and calculates lift and drag coefficients.',
+            },
+          ],
+        };
+
+        // Populate interest options
+        const interestSelect = document.getElementById('interests');
+        Object.keys(projectPool).forEach((key) => {
+          const option = document.createElement('option');
+          option.value = key;
+          option.textContent = key.charAt(0).toUpperCase() + key.slice(1);
+          interestSelect.appendChild(option);
+        });
+
+        // Helper to generate a roadmap based on level
+        function generateRoadmap(level) {
+          const roadmap = [];
+          if (level === 'beginner') {
+            roadmap.push(
+              'Week 1: Learn basic programming concepts and set up your development environment.'
+            );
+            roadmap.push(
+              'Week 2: Study fundamental topics relevant to your project (e.g., sensors, neural networks).'
+            );
+          } else if (level === 'intermediate') {
+            roadmap.push(
+              'Week 1: Review necessary programming libraries and tools for the project.'
+            );
+            roadmap.push(
+              'Week 2: Design the system architecture and prototype core components.'
+            );
+          } else {
+            roadmap.push(
+              'Week 1: Conduct a literature review on state‑of‑the‑art techniques related to the project.'
+            );
+            roadmap.push(
+              'Week 2: Plan experiments and gather or synthesize data if needed.'
+            );
+          }
+          roadmap.push('Week 3: Implement the core functionality of the project.');
+          roadmap.push('Week 4: Test, evaluate and iterate on your design.');
+          roadmap.push('Week 5: Document your project and publish it on GitHub with a README.');
+          return roadmap;
+        }
+
+        // Form submission handler
+        document
+          .getElementById('portfolio-form')
+          .addEventListener('submit', function (event) {
+            event.preventDefault();
+            // Extract form values
+            const form = event.target;
+            const name = form.name.value.trim();
+            const age = form.age.value;
+            const country = form.country.value.trim();
+            const level = form.level.value;
+            const university = form.university.value.trim();
+            const selectedOptions = Array.from(
+              form.interests.options
+            ).filter((opt) => opt.selected);
+            const interests = selectedOptions.map((opt) => opt.value);
+
+            // Choose the first matching pool or fallback to AI
+            let chosenTag = interests.find((i) => projectPool[i]);
+            if (!chosenTag) {
+              chosenTag = 'ai';
+            }
+            const projects = projectPool[chosenTag];
+            const project = projects[Math.floor(Math.random() * projects.length)];
+            const roadmap = generateRoadmap(level);
+
+            // Populate result fields
+            document.getElementById('project-title').textContent = project.title;
+            document.getElementById('project-description').textContent =
+              project.description;
+
+            // Roadmap list
+            const roadmapList = document.getElementById('roadmap-list');
+            roadmapList.innerHTML = '';
+            roadmap.forEach((step) => {
+              const li = document.createElement('li');
+              li.textContent = step;
+              roadmapList.appendChild(li);
+            });
+
+            // Details list
+            const detailsList = document.getElementById('details-list');
+            detailsList.innerHTML = '';
+            const detailItems = [
+              { label: 'Name', value: name },
+              { label: 'Age', value: age },
+              { label: 'Country', value: country },
+              { label: 'Programming Level', value: level },
+              { label: 'Interests', value: interests.join(', ') },
+              { label: 'Dream University', value: university },
+            ];
+            detailItems.forEach((item) => {
+              const li = document.createElement('li');
+              li.innerHTML =
+                '<strong>' +
+                item.label +
+                ':</strong> ' +
+                (item.value || '');
+              detailsList.appendChild(li);
+            });
+
+            // Show result section and hide form
+            document.getElementById('form-section').classList.add('hidden');
+            document.getElementById('result-section').classList.remove('hidden');
+          });
+
+        // Back button handler
+        document.getElementById('back-button').addEventListener('click', function () {
+          document.getElementById('result-section').classList.add('hidden');
+          document.getElementById('form-section').classList.remove('hidden');
+        });
+
+        // Current year in footer
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+      })();
+    </script>
+  </body>
+</html>
